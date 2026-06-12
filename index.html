@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YaoMoves — Your Body Recomp Starting Point</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rust: #C4622D;
+    --rust-dark: #A04E22;
+    --rust-light: #E8845A;
+    --jade: #3D6B5A;
+    --jade-light: #4E8A72;
+    --jade-pale: #D4E8E0;
+    --cream: #F5F0E8;
+    --cream-dark: #EDE5D8;
+    --ink: #1A1612;
+    --ink-soft: #3D3530;
+    --muted: #8A7F78;
+    --white: #FDFAF5;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--ink); min-height:100vh; overflow-x:hidden; }
+
+  /* HEADER */
+  .site-header { background:var(--ink); padding:18px 32px; display:flex; align-items:center; justify-content:space-between; }
+  .logo { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:900; color:var(--cream); letter-spacing:-0.02em; }
+  .logo span { color:var(--rust-light); }
+  .tagline-header { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; }
+
+  /* HERO */
+  .hero { background:var(--ink); padding:64px 32px 80px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-60px; right:-60px; width:320px; height:320px; background:radial-gradient(circle,rgba(196,98,45,0.18) 0%,transparent 70%); pointer-events:none; }
+  .hero::after { content:''; position:absolute; bottom:-40px; left:10%; width:200px; height:200px; background:radial-gradient(circle,rgba(61,107,90,0.15) 0%,transparent 70%); pointer-events:none; }
+  .hero-inner { max-width:680px; margin:0 auto; position:relative; z-index:1; }
+  .hero-eyebrow { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--rust-light); margin-bottom:20px; }
+  .hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2.2rem,5vw,3.4rem); font-weight:900; line-height:1.08; color:var(--white); margin-bottom:24px; letter-spacing:-0.02em; }
+  .hero h1 em { font-style:italic; color:var(--rust-light); }
+  .hero-sub { font-size:1.05rem; line-height:1.65; color:#B0A89E; max-width:520px; margin-bottom:12px; }
+  .hero-promise { display:flex; gap:24px; flex-wrap:wrap; margin-top:32px; }
+  .promise-item { display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--jade-pale); font-weight:500; }
+  .promise-dot { width:6px; height:6px; background:var(--jade-light); border-radius:50%; flex-shrink:0; }
+
+  /* FORM */
+  .form-section { max-width:720px; margin:-32px auto 0; padding:0 24px 80px; position:relative; z-index:10; }
+  .form-card { background:var(--white); border-radius:4px; box-shadow:0 24px 80px rgba(26,22,18,0.18),0 4px 16px rgba(26,22,18,0.08); overflow:hidden; }
+  .step-bar { background:var(--cream-dark); padding:16px 32px; display:flex; align-items:center; gap:8px; }
+  .step-pip { width:28px; height:4px; border-radius:2px; background:var(--cream); transition:background 0.3s; }
+  .step-pip.active { background:var(--rust); }
+  .step-pip.done { background:var(--jade); }
+  .step-label { margin-left:auto; font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; }
+  .form-body { padding:40px 40px 48px; }
+  .step { display:none; }
+  .step.active { display:block; animation:fadeUp 0.4s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .step-title { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color:var(--ink); margin-bottom:6px; letter-spacing:-0.02em; }
+  .step-desc { font-size:0.9rem; color:var(--muted); margin-bottom:36px; line-height:1.6; }
+
+  /* FIELDS */
+  .field-group { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+  .field-group.full { grid-template-columns:1fr; }
+  .field { display:flex; flex-direction:column; gap:8px; }
+  .field label { font-size:0.78rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); }
+  .field input,.field select { padding:14px 16px; border:2px solid var(--cream-dark); border-radius:3px; font-family:'DM Sans',sans-serif; font-size:1rem; color:#1A1612; background:#fff; transition:border-color 0.2s,background 0.2s; outline:none; -webkit-appearance:none; }
+  .field input:focus,.field select:focus { border-color:var(--rust); background:#fff; color:#1A1612; }
+  .field input::placeholder,.field select::placeholder { color:#aaa; opacity:1; }
+  .field input::-webkit-input-placeholder { color:#aaa; }
+  .field input::-moz-placeholder { color:#aaa; }
+  .field .hint { font-size:0.75rem; color:var(--muted); }
+
+  /* TILES */
+  .tile-group { display:grid; gap:12px; margin-bottom:20px; }
+  .tile-group.cols-3 { grid-template-columns:repeat(3,1fr); }
+  .tile { border:2px solid var(--cream-dark); border-radius:3px; padding:16px 14px; cursor:pointer; transition:all 0.2s; background:var(--cream); }
+  .tile:hover { border-color:var(--rust-light); background:var(--white); }
+  .tile.selected { border-color:var(--rust); background:rgba(196,98,45,0.06); }
+  .tile-icon { font-size:1.4rem; margin-bottom:6px; }
+  .tile-name { font-size:0.85rem; font-weight:600; color:var(--ink); margin-bottom:3px; }
+  .tile-desc { font-size:0.73rem; color:var(--muted); line-height:1.4; }
+
+  /* EMAIL */
+  .email-pitch { background:var(--cream-dark); border-radius:3px; padding:20px 24px; margin-bottom:28px; border-left:3px solid var(--rust); }
+  .email-pitch p { font-size:0.88rem; color:var(--ink-soft); line-height:1.6; }
+  .email-pitch strong { color:var(--rust-dark); }
+
+  /* BUTTONS */
+  .btn-row { display:flex; gap:12px; align-items:center; margin-top:32px; }
+  .btn-primary { background:var(--rust); color:var(--white); border:none; padding:16px 32px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; letter-spacing:0.04em; border-radius:3px; cursor:pointer; transition:background 0.2s,transform 0.15s; flex:1; }
+  .btn-primary:hover { background:var(--rust-dark); transform:translateY(-1px); }
+  .btn-back { background:none; border:2px solid var(--cream-dark); color:var(--muted); padding:14px 20px; font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:500; border-radius:3px; cursor:pointer; transition:all 0.2s; }
+  .btn-back:hover { border-color:var(--muted); color:var(--ink-soft); }
+  .error-msg { font-size:0.78rem; color:#C0392B; margin-top:8px; display:none; }
+
+  /* RESULTS */
+  #results { display:none; }
+  .results-section { max-width:720px; margin:0 auto; padding:0 24px 80px; }
+  .results-hero { background:var(--ink); padding:48px 40px 56px; position:relative; overflow:hidden; border-radius:4px 4px 0 0; }
+  .results-hero::before { content:''; position:absolute; top:-80px; right:-80px; width:280px; height:280px; background:radial-gradient(circle,rgba(196,98,45,0.2) 0%,transparent 65%); }
+  .results-name { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--rust-light); margin-bottom:12px; }
+  .results-headline { font-family:'Playfair Display',serif; font-size:clamp(1.6rem,4vw,2.4rem); font-weight:900; color:var(--white); line-height:1.15; margin-bottom:8px; letter-spacing:-0.02em; }
+  .results-headline em { color:var(--rust-light); font-style:italic; }
+  .results-sub { font-size:0.88rem; color:#B0A89E; line-height:1.6; max-width:480px; }
+  .results-body { background:var(--white); padding:40px 40px 48px; border-radius:0 0 4px 4px; box-shadow:0 24px 80px rgba(26,22,18,0.18); }
+
+  /* STAT CARDS */
+  .stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:40px; }
+  .stat-card { border:2px solid var(--cream-dark); border-radius:3px; padding:20px 16px; background:var(--white); position:relative; overflow:hidden; }
+  .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+  .stat-card.protein::before { background:var(--rust); }
+  .stat-card.goal::before { background:var(--jade); }
+  .stat-card.sessions::before { background:#8B7355; }
+  .stat-label { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+  .stat-value { font-family:'Playfair Display',serif; font-size:1.9rem; font-weight:700; color:var(--ink); line-height:1; margin-bottom:4px; }
+  .stat-value.small { font-size:1.3rem; }
+  .stat-unit { font-size:0.75rem; color:var(--muted); line-height:1.4; }
+
+  /* SECTION HEADS */
+  .section-head { display:flex; align-items:baseline; gap:12px; margin-bottom:20px; padding-bottom:12px; border-bottom:2px solid var(--cream-dark); margin-top:40px; }
+  .section-head:first-of-type { margin-top:0; }
+  .section-head h3 { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:var(--ink); }
+  .section-badge { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); }
+
+  /* NUTRITION */
+  .nutrition-block { background:var(--cream); border-radius:3px; padding:24px; margin-bottom:8px; }
+  .nutrition-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--cream-dark); font-size:0.88rem; }
+  .nutrition-row:last-child { border-bottom:none; }
+  .nutrition-row .label { color:var(--ink-soft); }
+  .nutrition-row .value { font-weight:600; color:var(--ink); font-family:'DM Mono',monospace; font-size:0.85rem; }
+  .nutrition-note { margin-top:12px; font-size:0.78rem; color:var(--muted); line-height:1.6; font-style:italic; }
+
+  /* RPE GUIDE */
+  .rpe-guide { background:var(--cream); border-radius:3px; padding:20px 24px; margin-bottom:8px; }
+  .rpe-guide-title { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--rust); margin-bottom:14px; }
+  .rpe-row { display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid var(--cream-dark); font-size:0.83rem; }
+  .rpe-row:last-child { border-bottom:none; }
+  .rpe-num { font-family:'DM Mono',monospace; font-size:0.9rem; font-weight:500; color:var(--rust); width:60px; flex-shrink:0; }
+  .rpe-desc { color:var(--ink-soft); line-height:1.4; }
+  .rpe-rir { font-size:0.75rem; color:var(--muted); margin-left:auto; flex-shrink:0; font-family:'DM Mono',monospace; }
+  .rpe-highlight { background:rgba(196,98,45,0.08); border-radius:3px; padding:2px 6px; }
+
+  /* 4-WEEK BLOCK */
+  .week-tabs { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:20px; }
+  .week-block { border:2px solid var(--cream-dark); border-radius:3px; padding:16px; background:var(--cream); }
+  .week-block.deload { border-color:var(--jade); background:rgba(61,107,90,0.04); }
+  .week-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .week-label { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); }
+  .week-badge { font-size:0.65rem; padding:3px 8px; border-radius:20px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; }
+  .badge-build { background:rgba(196,98,45,0.12); color:var(--rust-dark); }
+  .badge-peak { background:rgba(196,98,45,0.2); color:var(--rust-dark); }
+  .badge-deload { background:rgba(61,107,90,0.12); color:var(--jade); }
+  .week-sets { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:700; color:var(--ink); line-height:1; margin-bottom:4px; }
+  .week-sets-label { font-size:0.75rem; color:var(--muted); margin-bottom:10px; }
+  .week-detail { font-size:0.78rem; color:var(--ink-soft); line-height:1.5; }
+  .week-rpe { font-family:'DM Mono',monospace; font-size:0.72rem; color:var(--rust); margin-top:6px; }
+
+  /* SPLIT */
+  .split-grid { display:grid; gap:10px; margin-bottom:8px; }
+  .day-row { display:grid; grid-template-columns:80px 1fr auto; align-items:center; gap:16px; padding:14px 18px; background:var(--white); border:2px solid var(--cream-dark); border-radius:3px; }
+  .day-row.rest { background:var(--cream); opacity:0.7; }
+  .day-label { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+  .day-focus { font-size:0.88rem; font-weight:600; color:var(--ink); }
+  .day-type { font-size:0.7rem; padding:4px 10px; border-radius:20px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; }
+  .type-strength { background:rgba(196,98,45,0.12); color:var(--rust-dark); }
+  .type-hiit { background:rgba(61,107,90,0.12); color:var(--jade); }
+  .type-rest { background:var(--cream-dark); color:var(--muted); }
+
+  /* MOVEMENTS */
+  .movement-section { margin-bottom:8px; }
+  .movement-category { margin-bottom:20px; }
+  .category-label { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--rust); margin-bottom:10px; font-weight:500; }
+  .category-prescription { font-size:0.78rem; color:var(--muted); margin-bottom:10px; font-style:italic; }
+  .movement-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .movement-item { display:flex; align-items:flex-start; gap:10px; padding:10px 14px; background:var(--cream); border-radius:3px; font-size:0.83rem; color:var(--ink-soft); line-height:1.4; }
+  .movement-item::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--rust-light); flex-shrink:0; margin-top:5px; }
+
+  /* CONDITIONING */
+  .conditioning-track { border:2px solid var(--cream-dark); border-radius:3px; padding:20px 24px; margin-bottom:16px; background:var(--white); }
+  .conditioning-track.track-2 { border-color:var(--jade); }
+  .track-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .track-icon { font-size:1.2rem; }
+  .track-title { font-size:0.9rem; font-weight:600; color:var(--ink); }
+  .track-subtitle { font-size:0.75rem; color:var(--muted); }
+  .track-equipment { font-size:0.78rem; color:var(--ink-soft); margin-bottom:14px; padding:10px 14px; background:var(--cream); border-radius:3px; line-height:1.5; }
+  .track-protocols { display:grid; gap:8px; }
+  .protocol-row { display:flex; align-items:baseline; gap:10px; font-size:0.83rem; padding:8px 0; border-bottom:1px solid var(--cream-dark); }
+  .protocol-row:last-child { border-bottom:none; }
+  .protocol-level { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; width:90px; flex-shrink:0; color:var(--muted); }
+  .protocol-detail { color:var(--ink-soft); line-height:1.4; }
+  .protocol-highlight { color:var(--rust); font-weight:600; }
+
+  /* EXPECTATIONS */
+  .expectations-block { background:var(--jade); border-radius:3px; padding:28px; margin-top:40px; color:var(--white); }
+  .expectations-block h4 { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:16px; color:var(--jade-pale); }
+  .exp-item { display:flex; gap:12px; margin-bottom:12px; font-size:0.85rem; line-height:1.55; color:rgba(255,255,255,0.85); }
+  .exp-icon { font-size:1rem; flex-shrink:0; margin-top:1px; }
+
+  /* UPSELL */
+  .upsell-block { background:var(--cream-dark); border:2px solid var(--rust-light); border-radius:3px; padding:32px; text-align:center; position:relative; overflow:hidden; margin-top:40px; }
+  .upsell-block::before { content:"i'm playing the long game."; position:absolute; bottom:-8px; right:16px; font-family:'Playfair Display',serif; font-size:4rem; font-style:italic; color:rgba(196,98,45,0.06); white-space:nowrap; pointer-events:none; line-height:1; }
+  .upsell-eyebrow { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--rust); margin-bottom:12px; }
+  .upsell-block h3 { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:var(--ink); margin-bottom:12px; letter-spacing:-0.02em; }
+  .upsell-block p { font-size:0.88rem; color:var(--ink-soft); line-height:1.65; max-width:420px; margin:0 auto 24px; }
+  .btn-upsell { display:inline-block; background:var(--rust); color:var(--white); padding:16px 36px; border-radius:3px; font-weight:600; font-size:0.9rem; letter-spacing:0.04em; text-decoration:none; transition:background 0.2s,transform 0.15s; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; }
+  .btn-upsell:hover { background:var(--rust-dark); transform:translateY(-1px); }
+  .upsell-caveat { margin-top:12px; font-size:0.73rem; color:var(--muted); }
+
+  /* FOOTER */
+  .site-footer { background:var(--ink); padding:24px 32px; text-align:center; }
+  .site-footer p { font-size:0.75rem; color:var(--muted); }
+  .site-footer strong { color:var(--rust-light); }
+
+  /* RESPONSIVE */
+  @media(max-width:600px){
+    .form-body,.results-body{padding:28px 20px 36px}
+    .results-hero{padding:36px 20px 44px}
+    .field-group{grid-template-columns:1fr}
+    .tile-group.cols-3{grid-template-columns:1fr}
+    .stat-grid{grid-template-columns:1fr}
+    .movement-list{grid-template-columns:1fr}
+    .day-row{grid-template-columns:64px 1fr auto}
+    .week-tabs{grid-template-columns:1fr 1fr}
+    #condGrid{grid-template-columns:1fr !important; gap:12px}
+    #condA, #condB{padding:16px}
+    .conditioning-track{padding:16px}
+    .track-title{font-size:0.85rem}
+    .track-subtitle{font-size:0.75rem}
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Yao<span>Moves</span></div>
+  <div class="tagline-header">i'm playing the long game.</div>
+</header>
+
+<section class="hero" id="heroSection">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">free body recomp framework</div>
+    <h1>Your <em>personal</em> starting point. In 2 minutes.</h1>
+    <p class="hero-sub">Not a generic plan. Your protein target, your realistic goal, and a 4-week progressive workout framework built around your actual schedule.</p>
+    <div class="hero-promise">
+      <div class="promise-item"><div class="promise-dot"></div>Daily protein target</div>
+      <div class="promise-item"><div class="promise-dot"></div>Realistic recomp goal</div>
+      <div class="promise-item"><div class="promise-dot"></div>4-week progressive plan</div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<div class="form-section" id="formSection">
+  <div class="form-card">
+    <div class="step-bar">
+      <div class="step-pip active" id="pip1"></div>
+      <div class="step-pip" id="pip2"></div>
+      <div class="step-pip" id="pip3"></div>
+      <div class="step-pip" id="pip4"></div>
+      <div class="step-label" id="stepLabel">Step 1 of 4</div>
+    </div>
+    <div class="form-body">
+
+      <!-- STEP 1 -->
+      <div class="step active" id="step1">
+        <div class="step-title">Let's start with you.</div>
+        <div class="step-desc">Your stats help calculate a protein target and realistic goal that's actually achievable for your body.</div>
+        <div class="field-group">
+          <div class="field">
+            <label>Current Weight (lbs)</label>
+            <input type="number" id="weight" placeholder="e.g. 145" min="80" max="400">
+          </div>
+          <div class="field">
+            <label>Height</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <input type="number" id="heightFt" placeholder="ft" min="4" max="7">
+              <input type="number" id="heightIn" placeholder="in" min="0" max="11">
+            </div>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field">
+            <label>Age</label>
+            <input type="number" id="age" placeholder="e.g. 38" min="18" max="75">
+          </div>
+          <div class="field">
+            <label>Biological Sex</label>
+            <select id="sex">
+              <option value="">Select...</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+            </select>
+            <div class="hint">Used only for BMR calculation accuracy. Nothing else.</div>
+          </div>
+        </div>
+        <div class="field-group full">
+          <div class="field">
+            <label>Current Activity Level</label>
+            <select id="activity">
+              <option value="">Select...</option>
+              <option value="1.2">Mostly sedentary (desk job, minimal movement)</option>
+              <option value="1.375">Lightly active (1–2 workouts/week)</option>
+              <option value="1.55">Moderately active (3–4 workouts/week)</option>
+              <option value="1.725">Very active (5+ workouts/week)</option>
+            </select>
+          </div>
+        </div>
+        <div class="error-msg" id="err1">Please fill in all fields to continue.</div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="nextStep(1)">Next — Training Setup →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" id="step2">
+        <div class="step-title">How do you train?</div>
+        <div class="step-desc">This shapes your weekly split. Be honest — we build around your real life, not your ideal one.</div>
+        <div class="field" style="margin-bottom:24px;">
+        <div class="field" style="margin-bottom:24px;">
+          <label>Where are you starting from?</label>
+          <div class="tile-group" style="margin-top:10px;grid-template-columns:1fr;">
+            <div class="tile" onclick="selectTile(this,'goal','cut')">
+              <div class="tile-name">Carrying extra fat to lose</div>
+              <div class="tile-desc">Fat loss is my main priority right now</div>
+            </div>
+            <div class="tile" onclick="selectTile(this,'goal','recomp')">
+              <div class="tile-name">Want to lose some fat and build muscle at the same time</div>
+              <div class="tile-desc">Shift body composition gradually — less fat, more muscle</div>
+            </div>
+            <div class="tile" onclick="selectTile(this,'goal','maintain')">
+              <div class="tile-name">Fairly lean, want to recomp slowly</div>
+              <div class="tile-desc">Not carrying much extra fat — want to build muscle without gaining weight</div>
+            </div>
+            <div class="tile" onclick="selectTile(this,'goal','build')">
+              <div class="tile-name">Want to build muscle and am okay gaining some weight</div>
+              <div class="tile-desc">Prioritise muscle gain, comfortable eating above maintenance</div>
+            </div>
+            <div class="tile" onclick="selectTile(this,'goal','unsure')">
+              <div class="tile-name">Not sure — let the tool decide</div>
+              <div class="tile-desc">I'll let my stats guide the recommendation</div>
+            </div>
+          </div>
+        </div>
+          <label>How many days per week can you train?</label>
+          <div class="tile-group cols-3" style="margin-top:10px;">
+            <div class="tile" onclick="selectTile(this,'days','3')">
+              <div class="tile-name">3 days</div>
+              <div class="tile-desc">Full body each session</div>
+            </div>
+            <div class="tile" onclick="selectTile(this,'days','4')">
+              <div class="tile-name">4 days</div>
+              <div class="tile-desc">Upper / lower split</div>
+            </div>
+            <div class="tile" onclick="selectTile(this,'days','5')">
+              <div class="tile-name">5 days</div>
+              <div class="tile-desc">Upper / lower + conditioning</div>
+            </div>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:24px;">
+          <label>Your training experience</label>
+          <div class="tile-group cols-3" style="margin-top:10px;">
+            <div class="tile" onclick="selectTile(this,'experience','beginner')">
+              <div class="tile-name">Beginner</div>
+              <div class="tile-desc">Under 1 year consistent training</div>
+            </div>
+            <div class="tile" onclick="selectTile(this,'experience','intermediate')">
+              <div class="tile-name">Intermediate</div>
+              <div class="tile-desc">1–3 years, familiar with compounds</div>
+            </div>
+            <div class="tile" onclick="selectTile(this,'experience','advanced')">
+              <div class="tile-name">Advanced</div>
+              <div class="tile-desc">3+ years, tracks progression</div>
+            </div>
+          </div>
+        </div>
+        <div class="error-msg" id="err2">Please select both options to continue.</div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevStep(2)">← Back</button>
+          <button class="btn-primary" onclick="nextStep(2)">Next — Gym Setup →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" id="step3">
+        <div class="step-title">What's your gym situation?</div>
+        <div class="step-desc">Your workout plan will be built around what you actually have access to. No equipment-shaming here.</div>
+        <div class="tile-group" style="margin-bottom:12px;">
+          <div class="tile" onclick="selectTile(this,'gym','full')">
+            <div class="tile-icon">🏋️</div>
+            <div class="tile-name">Full gym</div>
+            <div class="tile-desc">Barbell, squat rack, cables, machines — traditional commercial gym (GoodLife, LA Fitness, etc.)</div>
+          </div>
+          <div class="tile" onclick="selectTile(this,'gym','condo')">
+            <div class="tile-icon">🏢</div>
+            <div class="tile-name">Condo / Hotel gym</div>
+            <div class="tile-desc">Dumbbells, cables, some machines — no barbell or squat rack</div>
+          </div>
+          <div class="tile" onclick="selectTile(this,'gym','home')">
+            <div class="tile-icon">🏠</div>
+            <div class="tile-name">Home setup</div>
+            <div class="tile-desc">Dumbbells and/or resistance bands, bodyweight</div>
+          </div>
+        </div>
+        <div class="error-msg" id="err3">Please select your gym access to continue.</div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevStep(3)">← Back</button>
+          <button class="btn-primary" onclick="nextStep(3)">Next — Almost There →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step" id="step4">
+        <div class="step-title">Where do I send your framework?</div>
+        <div class="step-desc">Your personalized plan generates instantly on the next screen. Drop your email and I'll send a copy you can save.</div>
+        <div class="email-pitch">
+          <p>You're getting your <strong>daily protein target</strong>, a <strong>realistic recomp goal</strong>, and a <strong>4-week progressive workout plan</strong> — all calculated from your numbers. No guessing. No generic plans.</p>
+        </div>
+        <div class="field-group full">
+          <div class="field">
+            <label>First Name</label>
+            <input type="text" id="firstName" placeholder="e.g. Karen">
+          </div>
+        </div>
+        <div class="field-group full">
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="you@example.com">
+            <div class="hint">No spam, ever. Unsubscribe anytime. Results appear immediately.</div>
+          </div>
+        </div>
+        <div class="error-msg" id="err4">Please enter your name and a valid email address.</div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevStep(4)">← Back</button>
+          <button class="btn-primary" onclick="handleGenerate(this)">Generate My Framework →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+  <div class="results-section">
+    <div class="results-hero">
+      <div class="results-name" id="resultsName"></div>
+      <div class="results-headline">Here's your <em>starting point.</em><br>Now we build.</div>
+      <p class="results-sub">These numbers are calibrated to your stats and your schedule. Save this page — come back to it when you need a reset.</p>
+    </div>
+    <div class="results-body">
+
+      <!-- STAT CARDS -->
+      <div class="stat-grid">
+        <div class="stat-card protein">
+          <div class="stat-label">Daily Protein Target</div>
+          <div class="stat-value" id="proteinStat">—</div>
+          <div class="stat-unit">grams / day<br>your non-negotiable</div>
+        </div>
+        <div class="stat-card goal">
+          <div class="stat-label">Recomp Calorie Target</div>
+          <div class="stat-value small" id="calStat">—</div>
+          <div class="stat-unit" id="calUnit">kcal / day</div>
+        </div>
+        <div class="stat-card sessions">
+          <div class="stat-label">Weekly Sessions</div>
+          <div class="stat-value" id="sessionStat">—</div>
+          <div class="stat-unit">days/week · 30–45 min</div>
+        </div>
+      </div>
+
+      <!-- NUTRITION -->
+      <div class="section-head">
+        <h3>Your Nutrition Starting Point</h3>
+        <div class="section-badge">evidence-based</div>
+      </div>
+      <div class="nutrition-block">
+        <div class="nutrition-row"><span class="label">Daily protein target</span><span class="value" id="nutritionProtein">—</span></div>
+        <div class="nutrition-row"><span class="label">Protein per meal (3 meals)</span><span class="value" id="nutritionPerMeal">—</span></div>
+        <div class="nutrition-row"><span class="label">Estimated maintenance calories (TDEE)</span><span class="value" id="nutritionTDEE">—</span></div>
+        <div class="nutrition-row"><span class="label">Recomp calorie target</span><span class="value" id="nutritionRecomp">—</span></div>
+      </div>
+      <p class="nutrition-note" id="nutritionNote" style="margin-bottom:8px;font-size:0.78rem;color:var(--muted);line-height:1.6;font-style:italic;"></p>
+
+      <!-- INTENSITY TARGET — simplified -->
+      <div class="section-head" style="margin-top:32px;">
+        <h3>Your Intensity Target</h3>
+        <div class="section-badge" id="rpeLabel">—</div>
+      </div>
+      <div class="rpe-guide">
+        <div class="rpe-guide-title">How hard should each set feel?</div>
+        <div class="rpe-row" style="border-bottom:none; align-items:flex-start;">
+          <div class="rpe-num rpe-highlight" id="rpeNum" style="font-size:1.1rem; width:80px;">—</div>
+          <div class="rpe-desc" id="rpeTarget" style="line-height:1.6;">—</div>
+        </div>
+      </div>
+
+      <!-- 4-WEEK BLOCK -->
+      <div class="section-head" style="margin-top:32px;">
+        <h3>Your 4-Week Progressive Plan</h3>
+        <div class="section-badge">add sets, not complexity</div>
+      </div>
+      <div class="week-tabs" id="weekTabs"></div>
+      <p style="font-size:0.78rem;color:var(--muted);line-height:1.6;font-style:italic;margin-bottom:8px;">Rest 90–120 seconds between sets for all strength work. Compounds first, accessories after. Same movement pattern every week — only the volume changes.</p>
+
+      <!-- WEEKLY SPLIT -->
+      <div class="section-head" style="margin-top:32px;">
+        <h3>Your Weekly Training Split</h3>
+        <div class="section-badge" id="splitBadge">—</div>
+      </div>
+      <div class="split-grid" id="splitGrid"></div>
+
+      <!-- MOVEMENTS -->
+      <div class="section-head" style="margin-top:32px;">
+        <h3>Starter Movement Framework</h3>
+        <div class="section-badge" id="gymBadge">—</div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);line-height:1.6;margin-bottom:20px;">Pick 2–3 movements per session from each relevant category. You don't need to do all of them — this is your menu, not a checklist.</p>
+
+      <div class="movement-category">
+        <div class="category-label">Lower Body — Posterior Chain (Hinge / Glutes)</div>
+        <div class="category-prescription" id="prescHinge">—</div>
+        <div class="movement-list" id="movesHinge"></div>
+      </div>
+      <div class="movement-category" style="margin-top:20px;">
+        <div class="category-label">Lower Body — Anterior Chain (Squat / Quads)</div>
+        <div class="category-prescription" id="prescSquat">—</div>
+        <div class="movement-list" id="movesSquat"></div>
+      </div>
+      <div class="movement-category" style="margin-top:20px;">
+        <div class="category-label">Upper Body — Pull (Back / Biceps)</div>
+        <div class="category-prescription" id="prescPull">—</div>
+        <div class="movement-list" id="movesPull"></div>
+      </div>
+      <div class="movement-category" style="margin-top:20px;">
+        <div class="category-label">Upper Body — Press (Chest / Shoulders / Triceps)</div>
+        <div class="category-prescription" id="prescPress">—</div>
+        <div class="movement-list" id="movesPress"></div>
+      </div>
+
+      <!-- CONDITIONING — side by side options -->
+      <div class="section-head" style="margin-top:32px;">
+        <h3>Conditioning Options</h3>
+        <div class="section-badge">20% of your sessions — pick one per day</div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);line-height:1.6;margin-bottom:16px;">Both options are pre-matched to your level. Pick whichever fits your equipment or energy that day — either one gets the job done.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;" id="condGrid">
+        <div class="conditioning-track" id="condA">
+          <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--rust);margin-bottom:10px;">Option A</div>
+          <div class="track-header" style="margin-bottom:10px;">
+            <div class="track-icon">🫀</div>
+            <div>
+              <div class="track-title" id="condATitle">—</div>
+              <div class="track-subtitle" id="condASubtitle">—</div>
+            </div>
+          </div>
+          <div class="track-equipment" id="condAEquipment">—</div>
+          <div style="background:rgba(196,98,45,0.06);border-radius:3px;padding:14px 16px;">
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rust);margin-bottom:6px;">Your protocol</div>
+            <div style="font-size:0.83rem;font-weight:600;color:var(--ink);line-height:1.6;" id="condAProtocol">—</div>
+          </div>
+        </div>
+        <div class="conditioning-track track-2" id="condB">
+          <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--jade);margin-bottom:10px;">Option B</div>
+          <div class="track-header" style="margin-bottom:10px;">
+            <div class="track-icon">⚡</div>
+            <div>
+              <div class="track-title" id="condBTitle">—</div>
+              <div class="track-subtitle" id="condBSubtitle">—</div>
+            </div>
+          </div>
+          <div class="track-equipment" id="condBEquipment">—</div>
+          <div style="background:rgba(61,107,90,0.06);border-radius:3px;padding:14px 16px;">
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--jade);margin-bottom:6px;">Your protocol</div>
+            <div style="font-size:0.83rem;font-weight:600;color:var(--ink);line-height:1.6;" id="condBProtocol">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPECTATIONS -->
+      <div class="expectations-block">
+        <h4>What to actually expect in 12 weeks</h4>
+        <div class="exp-item"><div class="exp-icon">💪</div><div>Your strength numbers will go up. That's the signal that it's working — not the scale.</div></div>
+        <div class="exp-item"><div class="exp-icon">👖</div><div>Clothes will start fitting differently before you see scale changes. Body recomp shifts composition, not always weight.</div></div>
+        <div class="exp-item"><div class="exp-icon">📉</div><div>The scale may stay flat or fluctuate ±3 lbs. This is normal and doesn't mean it's not working.</div></div>
+        <div class="exp-item"><div class="exp-icon">⚡</div><div>Energy and sleep quality often improve within weeks 2–4 when protein and training are consistent.</div></div>
+        <div class="exp-item"><div class="exp-icon">📸</div><div>Take progress photos at week 1 and week 6. The mirror tells you more than the scale.</div></div>
+      </div>
+
+      <!-- UPSELL -->
+      <div class="upsell-block">
+        <div class="upsell-eyebrow">what's next</div>
+        <h3>Ready for the full program?</h3>
+        <p>This framework is your foundation. The full YaoMoves program gives you the progressive week-by-week plan, exercise videos, and the exact structure that makes consistency actually happen for working moms.</p>
+        <button class="btn-upsell" onclick="alert('Waitlist coming soon — you\'ll be first to know.')">Join the Waitlist — Be First</button>
+        <div class="upsell-caveat">no pressure. your framework works on its own. this is just the next level.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p><strong>YaoMoves</strong> · Strength training for working moms · Toronto, ON · <em>i'm playing the long game.</em></p>
+</footer>
+
+<script>
+const state = { weight:null,heightFt:null,heightIn:null,age:null,sex:null,activity:null,days:null,experience:null,gym:null,goal:null,firstName:null,email:null };
+
+function nextStep(current){
+  if(!validateStep(current))return;
+  document.getElementById('step'+current).classList.remove('active');
+  document.getElementById('step'+(current+1)).classList.add('active');
+  updatePips(current+1);
+}
+function prevStep(current){
+  document.getElementById('step'+current).classList.remove('active');
+  document.getElementById('step'+(current-1)).classList.add('active');
+  updatePips(current-1);
+}
+function updatePips(active){
+  for(let i=1;i<=4;i++){
+    const pip=document.getElementById('pip'+i);
+    pip.className='step-pip';
+    if(i<active)pip.classList.add('done');
+    else if(i===active)pip.classList.add('active');
+  }
+  document.getElementById('stepLabel').textContent=`Step ${active} of 4`;
+}
+function selectTile(el,key,value){
+  el.parentElement.querySelectorAll('.tile').forEach(t=>t.classList.remove('selected'));
+  el.classList.add('selected');
+  state[key]=value;
+}
+function validateStep(step){
+  const err=document.getElementById('err'+step);
+  err.style.display='none';
+  if(step===1){
+    state.weight=parseFloat(document.getElementById('weight').value);
+    state.heightFt=parseFloat(document.getElementById('heightFt').value);
+    state.heightIn=parseFloat(document.getElementById('heightIn').value)||0;
+    state.age=parseFloat(document.getElementById('age').value);
+    state.sex=document.getElementById('sex').value;
+    state.activity=parseFloat(document.getElementById('activity').value);
+    if(!state.weight||!state.heightFt||!state.age||!state.sex||!state.activity){err.style.display='block';return false;}
+  }
+  if(step===2){if(!state.goal||!state.days||!state.experience){err.style.display='block';return false;}}
+  if(step===3){if(!state.gym){err.style.display='block';return false;}}
+  if(step===4){
+    state.firstName=document.getElementById('firstName').value.trim();
+    state.email=document.getElementById('email').value.trim();
+    if(!state.firstName||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.email)){err.style.display='block';return false;}
+  }
+  return true;
+}
+
+// ── DATA ──
+const MOVEMENTS = {
+  full:{
+    hinge:['Romanian Deadlift (Barbell)','Hip Thrust (Barbell)','Good Morning (Barbell)','Hyperextension','Barbell Deadlift'],
+    squat:['Back Squat','Bulgarian Split Squat (Barbell)','Hack Squat','Leg Press','Barbell Front Squat'],
+    pull:['Bent Over Row (Barbell)','Pull-Up','Lat Pulldown (Wide Grip)','Lat Pulldown (Narrow Grip)','Seated Cable Row (Wide Grip)','Seated Cable Row (Narrow Grip)','Face Pull (Cable)'],
+    press:['Bench Press (Barbell)','Overhead Press (Barbell)','Incline DB Press','Machine Chest Press (Upright/Seated)','Machine Chest Press (Incline)','Tricep Pushdown (Cable)']
+  },
+  condo:{
+    hinge:['Romanian Deadlift (DB)','Hip Thrust (Machine)','Hip Thrust (Smith Machine)','Cable Pull-Through','Glute Kickback Machine'],
+    squat:['Goblet Squat (DB)','DB Bulgarian Split Squat','Leg Press (if available)','DB Walking Lunges'],
+    pull:['Lat Pulldown (Wide Grip)','Lat Pulldown (Narrow Grip)','Seated Cable Row (Wide Grip)','Seated Cable Row (Narrow Grip)','DB Bent Over Row','Face Pull (Cable)'],
+    press:['DB Bench Press','DB Shoulder Press','Incline DB Press','Machine Chest Press (Upright/Seated)','Machine Chest Press (Incline)','Cable Tricep Pushdown']
+  },
+  home:{
+    hinge:['Single-Leg RDL (DB)','B-Stance RDL (DB)','Twisting RDL (DB)','Hip Thrust (Bodyweight/Band)','Glute Bridge Hold'],
+    squat:['Goblet Squat (DB)','Split Squat (DB)','Step-Up (DB)','DB Walking Lunges','Wall Sit'],
+    pull:['DB Bent Over Row','Band Pull-Apart','Resistance Band Row','Doorframe Pull-Up (if available)'],
+    press:['Push-Up Variations','DB Shoulder Press','DB Chest Press (Floor)','Band Tricep Pushdown']
+  }
+};
+
+const CONDITIONING_EQUIPMENT = {
+  full:{
+    track1:'Rower, ski erg, assault bike, or treadmill',
+    track2:'Barbell complex, jump rope, kettlebell swings, or sled push/pull'
+  },
+  condo:{
+    track1:'Rowing machine, stationary bike, stairmaster, or treadmill',
+    track2:'Battle ropes, dumbbell swings, jump rope, or burpee variations'
+  },
+  home:{
+    track1:'Jump rope, run outdoors, or cycle outdoors',
+    track2:'Burpees, dumbbell swing circuits, or bodyweight tabata'
+  }
+};
+
+const RPE_CONFIG = {
+  beginner:{ range:'RPE 6–7', plain:'End each set feeling like you could do 3–4 more reps. If you finish and think "that was easy", add a little weight next set. Form always comes first.' },
+  intermediate:{ range:'RPE 7–8', plain:'End each set with 2–3 reps left in the tank. Challenging but controlled — you should never be grinding or losing form to finish.' },
+  advanced:{ range:'RPE 8–9', plain:'End each set with 1–2 reps left. Hard. Your last rep should look the same as your first. If form breaks, that\'s past your range.' }
+};
+
+const CONDITIONING_PRESCRIBED = {
+  beginner:{ track1:'2×2 — 2 min hard, 2 min easy recovery. Repeat 2 rounds.', track2:'Tabata — 20 sec on / 10 sec off. 6 rounds per movement.' },
+  intermediate:{ track1:'3×3 — 3 min hard, 3 min easy recovery. Repeat 3 rounds.', track2:'EMOM 15 — set your reps, work every minute for 15 min.' },
+  advanced:{ track1:'4×4 — 4 min at 90%+ max HR, 3 min easy recovery. Repeat 4 rounds.', track2:'Rep block — high rep target, 15–20 min hard, rest only when needed.' }
+};
+
+// Compound vs accessory classification
+const COMPOUNDS = {
+  full:{ hinge:['Romanian Deadlift (Barbell)','Barbell Deadlift','Good Morning (Barbell)'], squat:['Back Squat','Bulgarian Split Squat (Barbell)','Barbell Front Squat'], pull:['Bent Over Row (Barbell)','Pull-Up'], press:['Bench Press (Barbell)','Overhead Press (Barbell)'] },
+  condo:{ hinge:['Romanian Deadlift (DB)'], squat:['Goblet Squat (DB)','DB Bulgarian Split Squat','DB Walking Lunges'], pull:['DB Bent Over Row'], press:['DB Bench Press','DB Shoulder Press','Incline DB Press'] },
+  home:{ hinge:['Single-Leg RDL (DB)','B-Stance RDL (DB)','Twisting RDL (DB)'], squat:['Goblet Squat (DB)','Split Squat (DB)','Step-Up (DB)','DB Walking Lunges'], pull:['DB Bent Over Row'], press:['Push-Up Variations','DB Shoulder Press','DB Chest Press (Floor)'] }
+};
+
+function isCompound(move, gym, cat){
+  return (COMPOUNDS[gym]&&COMPOUNDS[gym][cat]&&COMPOUNDS[gym][cat].includes(move));
+}
+
+function getPrescription(gym, cat, experience){
+  const rpe = RPE_CONFIG[experience].range;
+  return `Compounds: 8–10 reps @ ${rpe} · Accessories: 10–12 reps @ ${rpe}`;
+}
+
+// ── GENERATE ──
+async function handleGenerate(btn){
+  btn.textContent = 'Building your framework...';
+  btn.disabled = true;
+  await generateResults();
+  btn.textContent = 'Generate My Framework →';
+  btn.disabled = false;
+}
+
+async function generateResults(){
+  if(!validateStep(4))return;
+
+  // Subscribe to Kit in background — silent, non-blocking
+  const kitUrl = 'https://app.kit.com/forms/9150421/subscriptions';
+  try {
+    const formData = new FormData();
+    formData.append('email_address', state.email);
+    formData.append('first_name', state.firstName);
+    await fetch(kitUrl, { method: 'POST', body: formData, mode: 'no-cors' });
+  } catch(e) {
+    // Fail silently — never block results on email error
+  }
+
+  const w=state.weight, exp=state.experience, gym=state.gym, days=parseInt(state.days);
+
+  // Nutrition
+  const heightIn=(state.heightFt*12)+state.heightIn;
+  const wKg=w*0.453592, hCm=heightIn*2.54;
+
+  // Mifflin-St Jeor — sex-specific constant
+  const sexConstant = state.sex === 'male' ? 5 : -161;
+  const bmr=(10*wKg)+(6.25*hCm)-(5*state.age)+sexConstant;
+  const tdee=Math.round(bmr*state.activity);
+
+  // Goal-based calorie prescription
+  const WEEKLY_LOSS_CAP = 1.5;
+  const goal = state.goal;
+
+  // Auto-assign 'unsure' based on height/weight BMI proxy
+  let resolvedGoal = goal;
+  if(goal === 'unsure') {
+    const heightIn = (state.heightFt * 12) + state.heightIn;
+    const bmi = (w / (heightIn * heightIn)) * 703;
+    if(bmi >= 27) resolvedGoal = 'cut';
+    else if(bmi >= 23) resolvedGoal = 'recomp';
+    else resolvedGoal = 'maintain';
+  }
+
+  // Deficit/surplus by goal
+  let weeklyLossLbs = 0, dailyDeficit = 0, dailySurplus = 0;
+  if(resolvedGoal === 'cut') {
+    weeklyLossLbs = Math.min(w * 0.005, WEEKLY_LOSS_CAP);
+    dailyDeficit = Math.round((weeklyLossLbs * 3500) / 7);
+  } else if(resolvedGoal === 'recomp') {
+    weeklyLossLbs = Math.min(w * 0.0035, WEEKLY_LOSS_CAP);
+    dailyDeficit = Math.round((weeklyLossLbs * 3500) / 7);
+  } else if(resolvedGoal === 'maintain') {
+    weeklyLossLbs = 0; dailyDeficit = 0;
+  } else if(resolvedGoal === 'build') {
+    dailySurplus = 250; dailyDeficit = 0;
+  }
+
+  const weeklyLossCapped = (resolvedGoal === 'cut' && (w * 0.005) > WEEKLY_LOSS_CAP);
+  const weeklyLossDisplay = weeklyLossLbs.toFixed(2);
+
+  // Calorie floor
+  const calFloor = state.sex === 'male' ? 1500 : 1400;
+  const rawRecompCals = resolvedGoal === 'build'
+    ? Math.round(tdee + dailySurplus)
+    : Math.round(tdee - dailyDeficit);
+  const recompCals = Math.max(rawRecompCals, calFloor);
+  const calorieFloored = rawRecompCals < calFloor;
+  const lowTDEE = tdee < 1500;
+
+  // Protein: capped by sex max, then adjusted down if remaining cals < 600
+  const PROTEIN_CAP = state.sex === 'male' ? 200 : 180;
+  const MIN_REMAINING = 600;
+  let proteinHigh = Math.min(Math.round(w * 1.0), PROTEIN_CAP);
+  let proteinLow = Math.min(Math.round(w * 0.75), Math.round(PROTEIN_CAP * 0.85));
+  let proteinCapped = Math.round(w * 1.0) > PROTEIN_CAP;
+  // Check remaining cals after protein — reduce protein to fit if needed
+  let proteinAdjusted = false;
+  if((recompCals - (proteinHigh * 4)) < MIN_REMAINING) {
+    proteinHigh = Math.floor((recompCals - MIN_REMAINING) / 4);
+    proteinLow = Math.floor(proteinHigh * 0.85);
+    proteinAdjusted = true;
+  }
+
+  // Stat cards
+  document.getElementById('resultsName').textContent=`${state.firstName}'s body recomp framework`;
+  document.getElementById('proteinStat').textContent=`${proteinLow}–${proteinHigh}g`;
+  document.getElementById('sessionStat').textContent=days;
+
+  // Nutrition block
+  document.getElementById('nutritionProtein').textContent=`${proteinLow}–${proteinHigh}g`;
+  document.getElementById('nutritionPerMeal').textContent=`${Math.round(proteinLow/3)}–${Math.round(proteinHigh/3)}g per meal`;
+  document.getElementById('nutritionTDEE').textContent=`~${tdee.toLocaleString()} kcal`;
+
+  // Build calorie label and note based on resolved goal
+  let calLabel, calNote;
+
+  if(calorieFloored) {
+    calLabel = `~${recompCals.toLocaleString()} kcal (minimum floor applied)`;
+    calNote = `Your maintenance calories are naturally low, so we've set your target at our minimum of ${calFloor.toLocaleString()} kcal. Focus on hitting your protein target consistently and building your training habit first — your body composition will shift from the training alone.`;
+  } else if(resolvedGoal === 'build') {
+    calLabel = `~${recompCals.toLocaleString()} kcal (+250 kcal/day above maintenance)`;
+    calNote = `You're eating in a modest surplus to support muscle growth. At +250 kcal/day you'll gain slowly and cleanly — minimising unnecessary fat gain while giving your body what it needs to build. Hit your protein target of ${proteinHigh}g daily. Strength progression is your signal that it's working.`;
+  } else if(resolvedGoal === 'maintain') {
+    calLabel = `~${recompCals.toLocaleString()} kcal (maintenance)`;
+    calNote = `You're eating at maintenance — no deficit, no surplus. Your body will recomp from the training stimulus and high protein intake alone. This is the slow lane but it protects every ounce of muscle you've built. Strength going up is the signal. The scale may barely move and that's exactly right.`;
+  } else if(weeklyLossCapped) {
+    calLabel = `~${recompCals.toLocaleString()} kcal (−${dailyDeficit} kcal/day)`;
+    calNote = `We've capped your weekly loss target at 1.5 lbs to protect muscle mass — losing faster risks losing the muscle you're trying to build. Hit your protein target of ${proteinHigh}g daily and let the training do its job. Slower is smarter here.`;
+  } else if(lowTDEE) {
+    calLabel = `~${recompCals.toLocaleString()} kcal (−${dailyDeficit} kcal/day)`;
+    calNote = `Your maintenance calories are on the lower side. Hitting your protein target (${proteinHigh}g) is the most important lever — it protects muscle while in a deficit and will do more for your body composition than the calorie number alone. As your training increases, your TDEE will rise too.`;
+  } else if(proteinCapped || proteinAdjusted) {
+    calLabel = `~${recompCals.toLocaleString()} kcal (−${dailyDeficit} kcal/day)`;
+    calNote = `Your protein target has been set to ${proteinHigh}g — a practical ceiling sufficient for muscle building without consuming your entire calorie budget. Research shows diminishing returns above this range. Hit this consistently and you're doing the work.`;
+  } else if(resolvedGoal === 'recomp') {
+    calLabel = `~${recompCals.toLocaleString()} kcal (−${dailyDeficit} kcal/day)`;
+    calNote = `You're in a moderate deficit targeting ~${weeklyLossDisplay} lbs of fat loss per week — enough to shift body composition without sacrificing muscle. Aim for ${proteinHigh}g protein daily. Use how your clothes fit and your strength numbers as your real feedback signal, not the scale.`;
+  } else {
+    calLabel = `~${recompCals.toLocaleString()} kcal (−${dailyDeficit} kcal/day)`;
+    calNote = `You're targeting ~${weeklyLossDisplay} lbs of fat loss per week. Hit your protein target of ${proteinHigh}g daily — it's the most important number on this page. Use how your clothes fit and your strength progression as your real feedback signal, not the scale.`;
+  }
+
+  document.getElementById('nutritionRecomp').textContent = calLabel;
+  document.getElementById('nutritionNote').textContent = calNote;
+
+  // Stat card
+  document.getElementById('calStat').textContent=`~${recompCals.toLocaleString()}`;
+  document.getElementById('calUnit').textContent=calorieFloored ? 'kcal / day · minimum floor' : resolvedGoal === 'build' ? 'kcal / day · surplus' : resolvedGoal === 'maintain' ? 'kcal / day · maintenance' : 'kcal / day';
+
+  // RPE — single clean card
+  const rpe=RPE_CONFIG[exp];
+  document.getElementById('rpeLabel').textContent=`${exp} level`;
+  document.getElementById('rpeNum').textContent=rpe.range;
+  document.getElementById('rpeTarget').textContent=rpe.plain;
+
+  // 4-week blocks — compound starts at 2, accessory starts at 3
+  const weeks=[
+    {label:'Week 1',compSets:2,accSets:3,badge:'Learn',badgeClass:'badge-build',desc:'Find your working weight. Form over load. This is your baseline.'},
+    {label:'Week 2',compSets:3,accSets:4,badge:'Build',badgeClass:'badge-build',desc:'Add one set to everything. Go slightly heavier if last week felt easy.'},
+    {label:'Week 3',compSets:4,accSets:5,badge:'Peak',badgeClass:'badge-peak',desc:'Peak volume. This should feel hard. Stay in your intensity range.'},
+    {label:'Week 4',compSets:2,accSets:3,badge:'Deload',badgeClass:'badge-deload',desc:'Same weights as Week 3, back to Week 1 volume. Let your body absorb the work.'}
+  ];
+  const weekTabs=document.getElementById('weekTabs');
+  weekTabs.innerHTML='';
+  weeks.forEach((wk,i)=>{
+    const div=document.createElement('div');
+    div.className=`week-block${i===3?' deload':''}`;
+    div.innerHTML=`
+      <div class="week-header">
+        <div class="week-label">${wk.label}</div>
+        <div class="week-badge ${wk.badgeClass}">${wk.badge}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:4px;">Compounds</div>
+          <div class="week-sets">${wk.compSets}</div>
+          <div class="week-sets-label">sets</div>
+        </div>
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:4px;">Accessories</div>
+          <div class="week-sets">${wk.accSets}</div>
+          <div class="week-sets-label">sets</div>
+        </div>
+      </div>
+      <div class="week-detail">${wk.desc}</div>
+    `;
+    weekTabs.appendChild(div);
+  });
+
+  // Split
+  let splitDays=[];
+  if(days===3){
+    splitDays=[
+      {day:'Day 1',focus:'Full Body — Lower emphasis (Hinge + Squat + Pull)',type:'strength'},
+      {day:'Day 2',focus:'Rest / Light Walk',type:'rest'},
+      {day:'Day 3',focus:'Full Body — Upper emphasis (Press + Pull + Hinge)',type:'strength'},
+      {day:'Day 4',focus:'Rest / Light Walk',type:'rest'},
+      {day:'Day 5',focus:'Full Body + Conditioning Finisher',type:'hiit'},
+      {day:'Day 6',focus:'Rest',type:'rest'},
+      {day:'Day 7',focus:'Rest',type:'rest'},
+    ];
+  } else if(days===4){
+    splitDays=[
+      {day:'Day 1',focus:'Lower Body — Posterior Chain (Hinge / Glutes)',type:'strength'},
+      {day:'Day 2',focus:'Upper Body — Pull (Back / Biceps)',type:'strength'},
+      {day:'Day 3',focus:'Rest / Active Recovery',type:'rest'},
+      {day:'Day 4',focus:'Lower Body — Anterior Chain (Squat / Quads)',type:'strength'},
+      {day:'Day 5',focus:'Upper Body — Press + Conditioning Finisher',type:'hiit'},
+      {day:'Day 6',focus:'Rest',type:'rest'},
+      {day:'Day 7',focus:'Rest',type:'rest'},
+    ];
+  } else {
+    splitDays=[
+      {day:'Day 1',focus:'Lower Body — Posterior Chain (Hinge / Glutes)',type:'strength'},
+      {day:'Day 2',focus:'Upper Body — Pull (Back / Biceps)',type:'strength'},
+      {day:'Day 3',focus:'Conditioning / Power Day',type:'hiit'},
+      {day:'Day 4',focus:'Lower Body — Anterior Chain (Squat / Quads)',type:'strength'},
+      {day:'Day 5',focus:'Upper Body — Press (Chest / Shoulders)',type:'strength'},
+      {day:'Day 6',focus:'Rest',type:'rest'},
+      {day:'Day 7',focus:'Rest',type:'rest'},
+    ];
+  }
+  document.getElementById('splitBadge').textContent=`${days}x/week · 80/20 strength/conditioning`;
+  const splitGrid=document.getElementById('splitGrid');
+  splitGrid.innerHTML='';
+  splitDays.forEach(d=>{
+    const row=document.createElement('div');
+    row.className=`day-row${d.type==='rest'?' rest':''}`;
+    const typeLabel=d.type==='strength'?'Strength':d.type==='hiit'?'Conditioning':'Rest';
+    const typeClass=d.type==='strength'?'type-strength':d.type==='hiit'?'type-hiit':'type-rest';
+    row.innerHTML=`<div class="day-label">${d.day}</div><div class="day-focus">${d.focus}</div><div class="day-type ${typeClass}">${typeLabel}</div>`;
+    splitGrid.appendChild(row);
+  });
+
+  // Gym badge
+  const gymLabels={full:'Full gym',condo:'Condo / Hotel gym',home:'Home setup'};
+  document.getElementById('gymBadge').textContent=gymLabels[gym]||'';
+
+  // Movements — no compound labels, prescription simplified
+  const cats=['hinge','squat','pull','press'];
+  const prescIds=['prescHinge','prescSquat','prescPull','prescPress'];
+  const moveIds=['movesHinge','movesSquat','movesPull','movesPress'];
+  const compReps='8–10 reps', accReps='10–12 reps';
+  const prescText=`Pick 1–2 as your main lifts (${compReps}), then 1–2 finishers (${accReps}). Rest 90–120 sec between sets.`;
+  cats.forEach((cat,i)=>{
+    document.getElementById(prescIds[i]).textContent=prescText;
+    document.getElementById(moveIds[i]).innerHTML=MOVEMENTS[gym][cat].map(m=>`<div class="movement-item">${m}</div>`).join('');
+  });
+
+  // Conditioning — side by side, both pre-selected by experience
+  const ceq=CONDITIONING_EQUIPMENT[gym];
+
+  const condA = {
+    beginner:{ title:'Cardio Intervals', subtitle:'Go hard, recover fully, repeat.',
+      protocol:'2 min hard → 2 min easy recovery. Repeat 2 rounds (~8 min). Hard = can\'t hold a conversation.' },
+    intermediate:{ title:'Cardio Intervals', subtitle:'Go hard, recover fully, repeat.',
+      protocol:'3 min hard → 3 min easy recovery. Repeat 3 rounds (~18 min). Hard = can\'t hold a conversation.' },
+    advanced:{ title:'Norwegian 4×4', subtitle:'The gold standard for cardio adaptation.',
+      protocol:'4 min at 90%+ max effort → 3 min easy recovery. Repeat 4 rounds (~28 min). By round 3 you should be earning it.' }
+  };
+
+  const condB = {
+    beginner:{ title:'Tabata', subtitle:'Short bursts, maximum effort.',
+      protocol:'20 sec all-out effort → 10 sec rest. Repeat 6–8 rounds per movement (~4–6 min). Simple, brutal, effective.' },
+    intermediate:{ title:'EMOM 15', subtitle:'Every minute on the minute.',
+      protocol:'Set your reps at the top of each minute, rest whatever\'s left. 15 rounds total. Your rest shrinks as you get fitter.' },
+    advanced:{ title:'Rep Block', subtitle:'High volume, minimal rest.',
+      protocol:'Set a high rep target (e.g. 100 swings or 50 burpees). Go hard for 15–20 min. Rest only when form breaks.' }
+  };
+
+  const optA = condA[exp], optB = condB[exp];
+  document.getElementById('condATitle').textContent = optA.title;
+  document.getElementById('condASubtitle').textContent = optA.subtitle;
+  document.getElementById('condAEquipment').innerHTML = `<strong>Use any of:</strong> ${ceq.track1}`;
+  document.getElementById('condAProtocol').textContent = optA.protocol;
+
+  document.getElementById('condBTitle').textContent = optB.title;
+  document.getElementById('condBSubtitle').textContent = optB.subtitle;
+  document.getElementById('condBEquipment').innerHTML = `<strong>Use any of:</strong> ${ceq.track2}`;
+  document.getElementById('condBProtocol').textContent = optB.protocol;
+
+  // Show results
+  document.getElementById('formSection').style.display='none';
+  document.getElementById('heroSection').style.display='none';
+  document.getElementById('results').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
