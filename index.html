@@ -740,7 +740,31 @@ async function generateResults(){
   } catch(e) {
     // Fail silently — never block results on email error
   }
-
+// Send results email via Vercel function
+try {
+  await fetch('/api/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      firstName: state.firstName,
+      email: state.email,
+      protein: `${proteinLow}–${proteinHigh}g`,
+      calories: recompCals,
+      tdee: tdee,
+      goal: resolvedGoal,
+      days: days,
+      experience: exp,
+      gym: gym,
+      calLabel: calLabel,
+      calNote: calNote,
+      nutritionPerMeal: `${Math.round(proteinLow/3)}–${Math.round(proteinHigh/3)}g per meal`,
+      rpeRange: RPE_CONFIG[exp].range,
+      rpePlain: RPE_CONFIG[exp].plain,
+    })
+  });
+} catch(e) {
+  // Fail silently — never block results on email error
+}
   const w=state.weight, exp=state.experience, gym=state.gym, days=parseInt(state.days);
 
   // Nutrition
