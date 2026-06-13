@@ -984,7 +984,7 @@ async function generateResults(){
   document.getElementById('condBProtocol').textContent = optB.protocol;
 // Send results email via Vercel function
   try {
-    await fetch('/api/submit', {
+    await fetch('https://yaomoves-calculator.vercel.app/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
